@@ -1,0 +1,297 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Borrowers - JAZE Library</title>
+<link rel="stylesheet" href="style.css">
+<style>
+</style>
+</head>
+<body>
+<div class="sidebar" id="sidebar">
+  <h2 id="sidebarUsername">Username</h2>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="book.html">📚 Books</a>
+  <a href="borrower.html">👤 Borrower</a>
+  <a href="#">🔒 Security</a>
+  <!-- Admin-only Accounts link -->
+  <span id="adminLinkContainer"></span>
+  <a href="#" id="logoutBtn">🚪 Logout</a>
+</div>
+
+<div class="main">
+  <div class="header">
+    <h1>📚 JAZE Library</h1>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </div>
+
+  <div class="content">
+    <!-- Top row: search bar + create button -->
+    <div class="search-bar" style="align-items: center;">
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search borrower by name, email, or ID..." 
+      />
+      <button class="create-btn" id="createBorrowerBtn">➕ Create Borrower Card</button>
+    </div>
+
+    <!-- Second row: filter controls -->
+    <div class="filter-controls" style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+        <select id="LevelFilter">
+            <option value="All">Level</option>
+        </select>
+      
+        <select id="courseFilter">
+        <option value="All">Course</option>
+      </select>
+
+      <select id="yearFilter">
+        <option value="All">Year</option>
+      </select>
+
+      <button id="clearFilters">Clear Filters</button>
+    </div>
+
+    <!-- Borrower table -->
+    <div id="borrowerSection">
+      <table class="borrower-table" id="borrowerTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Level / Course</th>
+            <th>Year</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="borrowerTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- Create Borrower Card Modal -->
+<div id="createBorrowerModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Create Borrower Card</h3>
+      <button class="modal-close" id="closeCreateBorrowerModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <!-- ID Card Tag (uneditable) -->
+        <div class="field full">
+        <div id="idCardError" class="error-message" style="color:red; font-size:0.9em; margin-bottom:3px;"></div>
+          <label for="newBorrowerIDCard">ID Card</label>
+          <input type="text" id="newBorrowerIDCard" placeholder="Waiting for tag..." disabled/>
+        </div>
+
+        <!-- Borrower Name Inputs -->
+        <div class="field full">
+          <label for="newBorrowerFname">First Name</label>
+          <input type="text" id="newBorrowerFname" placeholder="Enter first name" required/>
+        </div>
+        <div class="field full">
+          <label for="newBorrowerMname">Middle Name</label>
+          <input type="text" id="newBorrowerMname" placeholder="Enter middle name"/>
+        </div>
+        <div class="field full">
+          <label for="newBorrowerLname">Last Name</label>
+          <input type="text" id="newBorrowerLname" placeholder="Enter last name" required/>
+        </div>
+        <div class="field full">
+          <label for="newBorrowerAbbrname">Abbreviated Name</label>
+          <input type="text" id="newBorrowerAbbrname" placeholder="Enter abbreviated name"/>
+        </div>
+        <div class="field full">
+          <label for="newBorrowerEmail">Email</label>
+          <input type="email" id="newBorrowerEmail" placeholder="Enter email" required/>
+        </div>
+
+        <!-- Level Dropdown -->
+        <div class="field full">
+          <label for="newBorrowerLevel">Level</label>
+          <select id="newBorrowerLevel" required>
+            <option value="">Select level</option>
+            <option value="Elementary">Elementary</option>
+            <option value="High School">High School</option>
+            <option value="Senior High School">Senior High School</option>
+            <option value="Undergraduate">Undergraduate</option>
+            <option value="Post-Graduate">Post-Graduate</option>
+            <option value="Visitor">Visitor</option>
+          </select>
+        </div>
+
+        <!-- Course Dropdown -->
+        <div class="field full">
+          <label for="newBorrowerCourse">Course</label>
+          <select id="newBorrowerCourse">
+            <option value="">Select course</option>
+          </select>
+        </div>
+
+        <!-- Year Dropdown -->
+        <div class="field full">
+          <label for="newBorrowerYear">Year</label>
+          <select id="newBorrowerYear">
+            <option value="">Select year</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions side-by-side">
+      <button class="no-btn" id="cancelCreateBorrower">Cancel</button>
+      <button class="btn btn-primary" id="submitCreateBorrower">Create Borrower</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- UPDATE MODAL (renamed IDs) -->
+<div id="updateBorrowerModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Update Borrower</h3>
+      <button class="modal-close" id="closeUpdateModal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="field full">
+        <label for="updFname">First Name</label>
+        <input type="text" id="updFname" placeholder="Enter first name" />
+      </div>
+
+      <div class="field full">
+        <label for="updMname">Middle Name</label>
+        <input type="text" id="updMname" placeholder="Enter middle name" />
+      </div>
+
+      <div class="field full">
+        <label for="updLname">Last Name</label>
+        <input type="text" id="updLname" placeholder="Enter last name" />
+      </div>
+
+      <div class="field full">
+        <label for="updAbbr">Abbreviated Name</label>
+        <input type="text" id="updAbbr" placeholder="Enter abbreviated name" />
+      </div>
+
+      <div class="field full">
+        <label for="updEmail">Email</label>
+        <input type="email" id="updEmail" placeholder="Enter email" />
+      </div>
+
+      <div class="field full">
+        <label for="updLevel">Level</label>
+        <select id="updLevel">
+          <option value="">Select level</option>
+          <option value="Elementary">Elementary</option>
+          <option value="High School">High School</option>
+          <option value="Senior High School">Senior High School</option>
+          <option value="Undergraduate">Undergraduate</option>
+          <option value="Post-Graduate">Post-Graduate</option>
+          <option value="Visitor">Visitor</option>
+        </select>
+      </div>
+
+      <div class="field full">
+        <label for="updCourse">Course</label>
+        <select id="updCourse">
+          <option value="">Select course</option>
+        </select>
+      </div>
+
+      <div class="field full">
+        <label for="updYear">Year</label>
+        <select id="updYear">
+          <option value="">Select year</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-actions side-by-side">
+      <button class="no-btn" id="cancelUpdateModal">Cancel</button>
+      <button class="btn btn-primary" id="submitUpdateModal">Update Borrower</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Delete Account Modal -->
+<div id="deleteAccountModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Delete Account</h3>
+      <button class="modal-close" id="closeDeleteAccountModal">&times;</button>
+    </div>
+    <div class="modal-body delete-preview">
+      <div class="delete-profile-pic">
+        <img id="deleteProfilePic" src="images/default-profile.jpg" alt="Profile"/>
+      </div>
+      <div class="delete-details">
+        <p><strong>Full Name:</strong> <span id="deleteFullName">—</span></p>
+        <p><strong>Email:</strong> <span id="deleteEmail">—</span></p>
+        <p><strong>Username:</strong> <span id="deleteUsername">—</span></p>
+        <p><strong>Role:</strong> <span id="deleteRole">—</span></p>
+      </div>
+    </div>
+    <div class="modal-actions side-by-side">
+      <button class="no-btn" id="cancelDeleteAccount">Cancel</button>
+      <button class="btn btn-primary" id="confirmDeleteAccount">Delete</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ======= Confirm Modal (Reusable) ======= -->
+<div class="modal" id="confirmModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <div class="modal-header">
+      <h3 id="confirmModalTitle">Confirm Action</h3>
+      <button class="modal-close" data-close-modal="confirmModal" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="confirmModalMessage">
+      Are you sure you want to continue?
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="confirmYes">Yes</button>
+      <button class="btn" data-close-modal="confirmModal">No</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= Success Modal (Reusable) ======= -->
+<div class="modal" id="successModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="successModalTitle">
+    <div class="modal-header">
+      <h3 id="successModalTitle">Success</h3>
+      <button class="modal-close" data-close-modal="successModal" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="successModalMessage">
+      Action completed successfully!
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" data-close-modal="successModal">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script type="module" src="logout.js"></script>
+<script type="module" src="sidebar.js"></script>
+<script type="module" src="admin_links.js"></script>
+<script type="module" src="borrower_users.js"></script>
+<script type="module" src="borrower_update_users.js"></script>
+<script type="module" src="borrower_create_user.js"></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="login_body">
+<div class="container">
+    <img src="images/JAZE_logo.png" alt="JAZE Logo" class="logo">
+    <h2 class="login_h2">Login</h2>
+    <div id="loginError" class="login_error"></div>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Username" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+    </form>
+    <div class="link">
+        <a id="forgotLink">Forgot password?</a>
+    </div>
+</div>
+
+<script type="module" src="login.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Library Book Viewer</title>
+<link rel="stylesheet" href="style.css">
+<style>
+
+</style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <h2 id="sidebarUsername">Username</h2>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="book.html">📚 Books</a>
+  <a href="#">🔒 Security</a>
+  <a href="#">🚪 Logout</a>
+</div>
+
+<div class="main">
+  <div class="header">
+    <h1>📚 JAZE Library</h1>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </div>
+
+  <div class="content">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by title, author, keyword, or book UID..." />
+      <button id="addBookBtn" style="display:none; margin-left:10px;">➕ Add New Book</button>
+    </div>
+    <div id="bookList">Loading...</div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="popup" id="popup">
+  <div class="popup-header">
+    <span id="popupTitle">Title</span>
+    <button class="close-btn" id="closePopup">Close</button>
+  </div>
+  <div class="popup-content" id="popupContent"></div>
+</div>
+
+<div id="addBookPopup" class="form-popup">
+  <h2 id="formTitle">Add New Book</h2>
+  <form id="addBookForm">
+    <label>Title</label>
+    <input type="text" id="bookTitle" required>
+    <label>Author</label>
+    <input type="text" id="bookAuthor" required>
+    <label>Keywords</label>
+    <div class="keyword-list" id="keywordList">
+      <input type="text" class="keywordInput" placeholder="Keyword">
+    </div>
+    <button type="button" id="addKeywordBtn">➕ Add Keyword</button>
+    
+    <label>Upload Cover Image</label>
+    <input type="file" id="bookCoverFile" accept="image/*">
+    <img id="coverPreview" class="cover-preview" alt="Cover Preview">
+    
+    <div class="buttons">
+      <button type="button" id="cancelAddBook">Cancel</button>
+      <button type="submit" id="submitBookBtn">Save</button>
+    </div>
+  </form>
+</div>
+
+<!-- Add Book Unit Popup -->
+<div id="addUnitPopup" class="form-popup">
+  <h2>Add Book Unit</h2>
+  <form id="addUnitForm">
+    <label>Book UID</label>
+    <input type="text" id="unitBookUid" placeholder="" required>
+    <label>Metadata ID</label>
+    <input type="text" id="unitMetadataId" placeholder="" readonly>
+    <label>Tag UID (Real-time from r3)</label>
+    <input type="text" id="unitTagUid" placeholder="Waiting for tag..." readonly required>
+    <label>Status</label>
+    <select id="unitStatus">
+      <option value="Available" selected>Available</option>
+      <option value="Not Available">Not Available</option>
+    </select>
+    <label>Location</label>
+    <input type="text" id="unitLocation" placeholder="Waiting for location..." readonly>
+    <div class="buttons">
+      <button type="button" id="cancelAddUnit">Cancel</button>
+      <button type="submit">Add Unit</button>
+    </div>
+  </form>
+</div>
+
+<script type="module" src="book.js"></script>
+<script type="module" src="sidebar.js"></script>
+
+<script type="module">
+import { db } from './firebase.js';
+import { ref, onValue, set } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+
+// Real-time update for r3 tag reader
+const tagInput = document.getElementById('unitTagUid');
+const locationInput = document.getElementById('unitLocation');
+const r3Ref = ref(db, 'readers/r3');
+
+onValue(r3Ref, (snapshot) => {
+  const r3Data = snapshot.val() || {};
+  tagInput.value = r3Data.tag_uid || '';
+  locationInput.value = r3Data.location || 'Unknown';
+});
+
+// Open Add Unit Popup and set Metadata ID
+export function openAddUnitPopup(metadataId) {
+  document.getElementById('unitMetadataId').value = metadataId;
+  document.getElementById('unitBookUid').value = ''; // leave blank for manual entry
+  document.getElementById('addUnitPopup').style.display = 'flex';
+  document.getElementById('overlay').style.display = 'block';
+}
+
+// Example gear button integration
+document.addEventListener('click', (e) => {
+  if (e.target && e.target.classList.contains('gear-btn')) {
+    const metadataId = e.target.dataset.metadataId;
+    openAddUnitPopup(metadataId);
+  }
+});
+
+// Add Unit form submission
+addUnitForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const bookUid = document.getElementById('unitBookUid').value.trim();
+  const metadataId = document.getElementById('unitMetadataId').value.trim();
+  const tagUid = document.getElementById('unitTagUid').value.trim();
+  const status = document.getElementById('unitStatus').value;
+  const location = document.getElementById('unitLocation').value.trim() || 'Unknown';
+
+  if (!bookUid || !metadataId || !tagUid) {
+    alert('Book UID, Metadata ID, and Tag UID are required.');
+    return;
+  }
+
+  const unitData = {
+    metadata_id: metadataId,
+    tag_uid: tagUid,
+    status: status,
+    location: location
+  };
+
+  try {
+    // Get all book_unit entries
+    const allUnitsRef = ref(db, 'book_unit');
+    onValue(allUnitsRef, async (snapshot) => {
+      const units = snapshot.val() || {};
+      
+      // Check for duplicate book_uid or tag_uid
+      const duplicate = Object.entries(units).some(([uid, data]) => {
+        return uid === bookUid || data.tag_uid === tagUid;
+      });
+
+      if (duplicate) {
+        alert('❌ Cannot add unit: Book UID or Tag UID already exists!');
+        return;
+      }
+
+      // Safe to add new unit
+      await set(ref(db, `book_unit/${bookUid}`), unitData);
+      alert('✅ Book Unit added successfully!');
+      addUnitForm.reset();
+      addUnitPopup.style.display = 'none';
+      overlay.style.display = 'none';
+    }, { onlyOnce: true });
+
+  } catch (err) {
+    alert('❌ Error adding book unit: ' + err.message);
+  }
+});
+
+
+// Cancel button
+cancelAddUnit.addEventListener('click', () => {
+  addUnitPopup.style.display = 'none';
+  overlay.style.display = 'none';
+  addUnitForm.reset();
+});
+</script>
+
+</body>
+</html>

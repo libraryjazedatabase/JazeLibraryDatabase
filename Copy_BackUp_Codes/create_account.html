@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Create Account</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: #f4f4f4;
+  }
+  .container {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  input, select, button {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+  button {
+    background: #4a90e2;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  button:hover { background: #357ab8; }
+  .message { font-size: 0.9rem; margin-bottom: 0.8rem; }
+  .success { color: green; }
+  .error { color: red; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Create Account</h2>
+  <div id="message" class="message"></div>
+
+  <form id="createForm">
+    <input type="text" id="username" placeholder="Username" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <select id="role">
+      <option value="librarian" selected>Librarian</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button type="submit">Create Account</button>
+  </form>
+</div>
+
+<script type="module">
+  import { auth, db } from './firebase.js';
+  import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+  import { ref, set } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+
+  const form = document.getElementById("createForm");
+  const message = document.getElementById("message");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    message.textContent = "";
+    message.className = "message";
+
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const role = document.getElementById("role").value;
+
+    if (!username || !email || !password) return;
+
+    try {
+      // 1️⃣ Create user in Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
+
+      // 2️⃣ Save user info in Realtime Database keyed by authUID
+      await set(ref(db, `accounts/${uid}`), {
+        username: username,
+        email: email,          // <-- added email here
+        fname: "",
+        mname: "",
+        lname: "",
+        abbrname: "",
+        role: role,
+        profile: "",
+        recovery_question: "",
+        recovery_answer: "",
+        lastPasswordUpdate: new Date().toISOString()
+      });
+
+      message.textContent = "✅ Account created successfully!";
+      message.classList.add("success");
+      form.reset();
+
+    } catch (error) {
+      console.error(error);
+      message.textContent = "❌ Error: " + error.message;
+      message.classList.add("error");
+    }
+  });
+</script>
+</body>
+</html>

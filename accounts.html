@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Accounts - JAZE Library</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <h2 id="sidebarUsername">Username</h2>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="book.html">📚 Books</a>
+  <a href="borrow_history.html">📚 Borrow History</a>
+  <a href="borrower.html">👤 Borrower</a>
+  <a href="reader.html">📚 Reader</a>
+  <span id="adminLinkContainer"></span>
+  <hr>
+  <a href="#" id="securityCheckerBtn">🔒 Security Checker</a>
+  <a href="#" id="addSecurityTagBtn">📚 Add Security Tag</a>
+  <hr>
+  <a href="#" id="logoutBtn">🚪 Logout</a>
+</div>
+
+
+<div class="main">
+  <div class="header">
+    <h1>📚 JAZE Library</h1>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </div>
+
+  <div class="content">
+    <!-- Admin Accounts header + Create Account button -->
+    <div class="section-header">
+      <h2>Admin Accounts</h2>
+      <button class="create-btn" id="createAccountBtn">➕ Create Account</button>
+    </div>
+    <table class="accounts-table"  id="adminTable">
+      <thead>
+        <tr>
+          <th>Profile</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Username</th>
+        </tr>
+      </thead>
+      <tbody id="adminTableBody"></tbody>
+    </table>
+
+    <!-- Librarian Accounts -->
+    <div id="librarianSection">
+      <h2>Librarian Accounts</h2>
+      <table class="accounts-table"  id="librarianTable">
+        <thead>
+          <tr>
+            <th>Profile</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="librarianTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Picture Popup -->
+<div id="profilePopup" class="accounts-popup-overlay">
+  <div class="accounts-popup-content">
+    <span id="closeProfilePopup" class="close-btn"><!--&times;--></span>
+    <img id="profilePopupImg" src="" alt="Profile" class="popup-image"/>
+  </div>
+</div>
+
+<!-- Create Account Modal -->
+<div id="createAccountModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Create New Account</h3>
+      <button class="modal-close" id="closeCreateAccountModal"><!--&times;--></button>
+    </div>
+    <div class="modal-body">
+      <!-- Added form wrapper -->
+      <form id="addAccountForm" novalidate>
+        <div class="modal-row">
+          <div class="field full">
+             <p id="accountError" style="color: red; font-size: 13px; margin-bottom: 6px; display: none;"></p>      <!-- Error text appears here -->
+            <label for="newUsername">Username</label>
+            <input type="text" id="newUsername" placeholder="Enter username" required />
+          </div>
+          <div class="field full">
+            <label for="newEmail">Email</label>
+            <input type="email" id="newEmail" placeholder="Enter email" required />
+          </div>
+          <div class="field full">
+            <label for="newPassword">Password</label>
+            <input type="password" id="newPassword" placeholder="Enter password" required />
+          </div>
+          <div class="field full">
+            <label for="newRole">Role</label>
+            <select id="newRole" required>
+              <option value="librarian" selected>Librarian</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-actions side-by-side">
+      <button class="btn btn-primary" id="submitCreateAccount">Create Account</button>
+      <button class="no-btn" id="cancelCreateAccount">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Update Account Modal -->
+<div id="updateAccountModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Update Account</h3>
+      <button class="modal-close" id="closeUpdateAccountModal"><!--&times;--></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div class="field full">
+          <p id="updateAccountError" style="color: red; font-size: 13px; margin-bottom: 6px; display: none;">
+            <!-- Error text appears here -->
+          </p>
+          <label for="updateUsername">Username</label>
+          <input type="text" id="updateUsername" placeholder="Enter username" required/>
+        </div>
+        <div class="field full">
+          <label for="updateFname">First Name</label>
+          <input type="text" id="updateFname" placeholder="Enter first name" required/>
+        </div>
+        <div class="field full">
+          <label for="updateMname">Middle Name</label>
+          <input type="text" id="updateMname" placeholder="Enter middle name"/>
+        </div>
+        <div class="field full">
+          <label for="updateLname">Last Name</label>
+          <input type="text" id="updateLname" placeholder="Enter last name" required/>
+        </div>
+        <div class="field full">
+          <label for="updateAbbrname">Abbreviated Name</label>
+          <input type="text" id="updateAbbrname" placeholder="Enter abbreviated name"/>
+        </div>
+        <div class="field full">
+          <label for="updateRole">Role</label>
+          <select id="updateRole" required>
+            <option value="librarian">Librarian</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions side-by-side">
+      <button class="btn btn-primary" id="submitUpdateAccount">Update Account</button>
+      <button class="no-btn" id="cancelUpdateAccount">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div id="deleteAccountModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Delete Account</h3>
+      <button class="modal-close" id="closeDeleteAccountModal"><!--&times;--></button>
+    </div>
+    <div class="modal-body delete-preview">
+      <div class="delete-profile-pic">
+        <img id="deleteProfilePic" src="images/default-profile.jpg" alt="Profile"/>
+      </div>
+      <div class="delete-details">
+        <p><strong>Full Name:</strong> <span id="deleteFullName">—</span></p>
+        <p><strong>Email:</strong> <span id="deleteEmail">—</span></p>
+        <p><strong>Username:</strong> <span id="deleteUsername">—</span></p>
+        <p><strong>Role:</strong> <span id="deleteRole">—</span></p>
+      </div>
+    </div>
+    <div class="modal-actions side-by-side">
+      <button class="btn btn-primary" id="confirmDeleteAccount">Delete</button>
+      <button class="no-btn" id="cancelDeleteAccount">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ======= Confirm Modal (Reusable) ======= -->
+<div class="modal" id="confirmModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <div class="modal-header">
+      <h3 id="confirmModalTitle">Confirm Action</h3>
+      <button class="modal-close" data-close-modal="confirmModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body" id="confirmModalMessage">
+      Are you sure you want to continue?
+    </div>
+    <div class="modal-actions">
+      <button class="btn no-btn" data-close-modal="confirmModal">No</button>
+      <button class="btn btn-primary" id="confirmYes">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= Success Modal (Reusable) ======= -->
+<div class="modal" id="successModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="successModalTitle">
+    <div class="modal-header">
+      <h3 id="successModalTitle">Success</h3>
+      <button class="modal-close" data-close-modal="successModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body" id="successModalMessage">
+      Action completed successfully!
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" data-close-modal="successModal">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script type="module" src="logout.js"></script>
+<script type="module" src="sidebar.js"></script>
+<script type="module" src="admin_links.js"></script>
+<script type="module" src="accounts_create_user.js"></script>
+<script type="module" src="accounts_users.js"></script>
+<script type="module" src="accounts_update_user.js"></script>
+<script type="module" src="accounts_delete_user.js"></script>
+<script type="module" src="auto_update_status.js"></script>
+<script type="module">
+  import { startLocationTracking } from './book_tracking.js';
+  startLocationTracking(); // starts the location tracking and fallback auto-update
+</script>
+<script type="module" src="zulu_time.js"></script>
+<script type="module" src="latest_history.js"></script>
+<script type="module" src="outside_borrow_notification.js"></script>
+<script type="module">
+  import { initReaderFunctionButtons } from "./reader_function.js";
+  initReaderFunctionButtons(); // Automatically binds to the buttons by ID
+</script>
+
+
+
+</body>
+</html>

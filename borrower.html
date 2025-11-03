@@ -1,0 +1,360 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Borrowers - JAZE Library</title>
+<link rel="stylesheet" href="style.css">
+<style>
+</style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <h2 id="sidebarUsername">Username</h2>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="book.html">📚 Books</a>
+  <a href="borrow_history.html">📚 Borrow History</a>
+  <a href="borrower.html">👤 Borrower</a>
+  <a href="reader.html">📚 Reader</a>
+  <span id="adminLinkContainer"></span>
+  <hr>
+  <a href="#" id="securityCheckerBtn">🔒 Security Checker</a>
+  <a href="#" id="addSecurityTagBtn">📚 Add Security Tag</a>
+  <hr>
+  <a href="#" id="logoutBtn">🚪 Logout</a>
+</div>
+
+<div class="main">
+  <div class="header">
+    <h1>📚 JAZE Library</h1>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </div>
+
+  <div class="content">
+    <div class="controls">
+    <!-- Top row: search bar + create button -->
+     
+    <div class="search-bar" style="align-items: center;">
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search borrower by Name, Email, or Borrower ID" 
+      />
+      <button class="create-btn" id="createBorrowerBtn">➕ Create Borrower Card</button>
+    </div>
+
+    <!-- Second row: filter controls -->
+    <div class="filter-controls" style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+        <select id="LevelFilter">
+            <option value="All">Level</option>
+        </select>
+      
+        <select id="courseFilter">
+        <option value="All">Course</option>
+      </select>
+
+      <select id="yearFilter">
+        <option value="All">Year</option>
+      </select>
+
+      <button id="clearFilters">Clear Filters</button>
+    </div>
+    </div>
+
+    <!-- Borrower table -->
+    <div id="borrowerSection">
+      <table class="borrower-table" id="borrowerTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Level / Course</th>
+            <th>Year</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="borrowerTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- Create Borrower Card Modal -->
+<div id="createBorrowerModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Create Borrower Card</h3>
+      <button class="modal-close" id="closeCreateBorrowerModal"><!--&times;--></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <!-- ID Card Tag (uneditable) -->
+
+
+        <div class="field full">
+        <div id="idCardError" class="error-message" style="color:red; font-size:0.9em; margin-bottom:3px;"></div>
+          <label for="newBorrowerIDCard">Borrower ID</label>
+       <!--   <input type="text" id="newBorrowerIDCard" placeholder="Waiting for tag..." disabled/> -->
+          <input type="text" id="newBorrowerIDCard" placeholder="Enter Borrower ID" required/>
+        </div>
+
+        <!-- Borrower Name Inputs -->
+        <div class="field full">
+          <label for="newBorrowerFname">First Name</label>
+          <input type="text" id="newBorrowerFname" placeholder="Enter first name" required/>
+        </div>
+        <div class="field full">
+          <label for="newBorrowerMname">Middle Name</label>
+          <input type="text" id="newBorrowerMname" placeholder="Enter middle name"/>
+        </div>
+        <div class="field full">
+          <label for="newBorrowerLname">Last Name</label>
+          <input type="text" id="newBorrowerLname" placeholder="Enter last name" required/>
+        </div>
+        <div class="field full">
+          <label for="newBorrowerAbbrname">Abbreviated Name</label>
+          <input type="text" id="newBorrowerAbbrname" placeholder="Enter abbreviated name"/>
+        </div>
+        <div class="field full">
+          <label for="newBorrowerEmail">Email</label>
+          <input type="email" id="newBorrowerEmail" placeholder="Enter email" required/>
+        </div>
+
+        <!-- Level Dropdown -->
+        <div class="field full">
+          <label for="newBorrowerLevel">Level</label>
+          <select id="newBorrowerLevel" required>
+            <option value="">Select level</option>
+            <option value="Elementary">Elementary</option>
+            <option value="High School">High School</option>
+            <option value="Senior High School">Senior High School</option>
+            <option value="Undergraduate">Undergraduate</option>
+            <option value="Post-Graduate">Post-Graduate</option>
+            <option value="Visitor">Visitor</option>
+          </select>
+        </div>
+
+        <!-- Course Dropdown -->
+        <div class="field full">
+          <label for="newBorrowerCourse">Course</label>
+          <select id="newBorrowerCourse">
+            <option value="">Select course</option>
+          </select>
+        </div>
+
+        <!-- Year Dropdown -->
+        <div class="field full">
+          <label for="newBorrowerYear">Year</label>
+          <select id="newBorrowerYear">
+            <option value="">Select year</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions side-by-side">
+      <button class="no-btn" id="cancelCreateBorrower">Cancel</button>
+      <button class="btn btn-primary" id="submitCreateBorrower">Create Borrower</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Update Borrower Modal -->
+<div id="updateBorrowerModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Update Borrower</h3>
+      <button class="modal-close" id="closeUpdateBorrowerModal"><!--&times;--></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div class="field full">
+          <label for="updateBorrowerFname">First Name</label>
+          <input type="text" id="updateBorrowerFname" placeholder="Enter first name" required/>
+        </div>
+        <div class="field full">
+          <label for="updateBorrowerMname">Middle Name</label>
+          <input type="text" id="updateBorrowerMname" placeholder="Enter middle name"/>
+        </div>
+        <div class="field full">
+          <label for="updateBorrowerLname">Last Name</label>
+          <input type="text" id="updateBorrowerLname" placeholder="Enter last name" required/>
+        </div>
+        <div class="field full">
+          <label for="updateBorrowerAbbrname">Abbreviated Name</label>
+          <input type="text" id="updateBorrowerAbbrname" placeholder="Enter abbreviated name"/>
+        </div>
+        <div class="field full">
+          <label for="updateBorrowerEmail">Email</label>
+          <input type="email" id="updateBorrowerEmail" placeholder="Enter email" required/>
+        </div>
+
+
+<!-- Level Dropdown -->
+<div class="field full">
+  <label for="updateBorrowerLevel">Level</label>
+  <select id="updateBorrowerLevel" required>
+    <option value="">Select level</option>
+    <option value="Elementary">Elementary</option>
+    <option value="High School">High School</option>
+    <option value="Undergraduate">Undergraduate</option>
+    <option value="Post-Graduate">Post-Graduate</option>
+    <option value="Visitor">Visitor</option>
+  </select>
+</div>
+
+<!-- Course Dropdown -->
+<div class="field full">
+  <label for="updateBorrowerCourse">Course</label>
+  <select id="updateBorrowerCourse">
+    <option value="">Select course</option>
+  </select>
+</div>
+
+<!-- Year Dropdown -->
+<div class="field full">
+  <label for="updateBorrowerYear">Year</label>
+  <select id="updateBorrowerYear">
+    <option value="">Select year</option>
+  </select>
+</div>
+
+      </div>
+    </div>
+    <div class="modal-actions side-by-side">
+      <button class="no-btn" id="cancelUpdateBorrower">Cancel</button>
+      <button class="btn btn-primary" id="submitUpdateBorrower">Update Borrower</button>
+    </div>
+  </div>
+</div>
+
+<!-- Borrower History Modal -->
+<div id="borrowerHistoryModal" class="modal">
+  <div class="modal-content" style="width:90%; max-width:1000px; padding:20px; position:relative;">
+    <h3 style="margin-bottom:20px;">Borrower History</h3>
+    <button id="closeHistoryModalBtn" class="btn no-btn"
+            style="position:absolute; top:20px; right:20px;">Close</button>
+    <div class="modal-body">
+      <div id="historyContent">
+        <!-- Table will be inserted here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= Confirm Modal (Reusable) ======= -->
+<div class="modal" id="confirmModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <div class="modal-header">
+      <h3 id="confirmModalTitle">Confirm Action</h3>
+      <button class="modal-close" data-close-modal="confirmModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body" id="confirmModalMessage">
+      Are you sure you want to continue?
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="confirmYes">Yes</button>
+      <button class="btn no-btn" data-close-modal="confirmModal">No</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= Success Modal (Reusable) ======= -->
+<div class="modal" id="successModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="successModalTitle">
+    <div class="modal-header">
+      <h3 id="successModalTitle">Success</h3>
+      <button class="modal-close" data-close-modal="successModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body" id="successModalMessage">
+      Action completed successfully!
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" data-close-modal="successModal">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal for Update Borrower -->
+<div class="modal" id="updateConfirmModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="updateConfirmModalTitle">
+    <div class="modal-header">
+      <h3 id="updateConfirmModalTitle">Confirm Update</h3>
+      <button class="modal-close" data-close-modal="updateConfirmModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body" id="updateConfirmModalMessage">
+      Are you sure you want to update this borrower?
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="updateConfirmYes">Yes</button>
+      <button class="btn no-btn" data-close-modal="updateConfirmModal">No</button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal for Update Borrower -->
+<div class="modal" id="updateSuccessModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="updateSuccessModalTitle">
+    <div class="modal-header">
+      <h3 id="updateSuccessModalTitle">Success</h3>
+      <button class="modal-close" data-close-modal="updateSuccessModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body" id="updateSuccessModalMessage">
+      Borrower updated successfully!
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary"  id="updateSuccessModal" data-close-modal="updateSuccessModal">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Borrower Confirmation Modal -->
+<div class="modal" id="deleteBorrowerModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="deleteBorrowerModalTitle">
+    <div class="modal-header">
+      <h3 id="deleteBorrowerModalTitle">Confirm Delete</h3>
+      <button class="modal-close" data-close-modal="deleteBorrowerModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body" id="deleteBorrowerModalMessage">
+      Are you sure you want to delete this borrower? This action cannot be undone.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="deleteConfirmYes">Yes</button>
+      <button class="btn no-btn" data-close-modal="deleteBorrowerModal">No</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Scripts -->
+<script type="module" src="logout.js"></script>
+<script type="module" src="sidebar.js"></script>
+<script type="module" src="admin_links.js"></script>
+<script type="module" src="borrower_users.js"></script>
+<script type="module" src="borrower_update_users.js"></script>
+<script type="module" src="borrower_create_user.js"></script>
+<script type="module" src="borrower_view_history.js"></script>
+<script type="module" src="borrower_delete_user.js"></script>
+<script type="module" src="auto_update_status.js"></script>
+<script type="module">
+  import { startLocationTracking } from './book_tracking.js';
+  startLocationTracking(); // starts the location tracking and fallback auto-update
+</script>
+<script type="module" src="zulu_time.js"></script>
+<!--<script type="module" src="latest_history.js"></script>-->
+<script type="module" src="outside_borrow_notification.js"></script>
+<script type="module">
+  import { initReaderFunctionButtons } from "./reader_function.js";
+  initReaderFunctionButtons(); // Automatically binds to the buttons by ID
+</script>
+
+
+
+
+</body>
+</html>

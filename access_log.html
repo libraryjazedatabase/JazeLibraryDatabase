@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Access Log - JAZE Library</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <h2 id="sidebarUsername">Username</h2>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="book.html">📚 Books</a>
+  <a href="borrow_history.html">📚 Borrow History</a>
+  <a href="borrower.html">👤 Borrower</a>
+  <a href="reader.html">📚 Reader</a>
+  <span id="adminLinkContainer"></span>
+  <hr>
+  <a href="#" id="securityCheckerBtn">🔒 Security Checker</a>
+  <a href="#" id="addSecurityTagBtn">📚 Add Security Tag</a>
+  <hr>
+  <a href="#" id="logoutBtn">🚪 Logout</a>
+</div>
+
+<div class="main">
+  <div class="header">
+    <h1>📚 JAZE Library</h1>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </div>
+
+<div class="content">
+  <div class="controls">
+    <!-- Search bar and filters here -->
+    <div class="search-bar" style="align-items: center;">
+      <input type="text" id="searchInput" placeholder="Search by name" />
+    </div>
+
+    <div class="filter-controls" style="display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;">
+      <select id="roleFilter">
+        <option value="All">All Roles</option>
+      </select>
+      <select id="sessionFilter">
+        <option value="All">All Sessions</option>
+        <option value="Complete">Complete</option>
+        <option value="Incomplete">Incomplete</option>
+      </select>
+      <button id="clearFilters">Clear Filters</button>
+    </div>
+  </div>
+
+  <!-- Scrollable table container -->
+<!-- Scrollable table container -->
+<div class="access-log-list">
+  <table class="borrower-table" id="accessLogTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Login Time</th>
+        <th>Logout Time</th>
+      </tr>
+    </thead>
+    <tbody id="accessLogTableBody"></tbody>
+  </table>
+</div>
+
+</div>
+
+  </div>
+</div>
+
+
+<!-- Scripts -->
+<script type="module" src="logout.js"></script>
+<script type="module" src="sidebar.js"></script>
+<script type="module" src="admin_links.js"></script>
+<script type="module" src="access_log.js"></script>
+<script type="module" src="auto_update_status.js"></script>
+<script type="module">
+  import { startLocationTracking } from './book_tracking.js';
+  startLocationTracking(); // starts the location tracking and fallback auto-update
+</script>
+<script type="module" src="zulu_time.js"></script>
+<!--<script type="module" src="latest_history.js"></script>-->
+<script type="module" src="outside_borrow_notification.js"></script>
+<script type="module">
+  import { initReaderFunctionButtons } from "./reader_function.js";
+  initReaderFunctionButtons(); // Automatically binds to the buttons by ID
+</script>
+</body>
+</html>

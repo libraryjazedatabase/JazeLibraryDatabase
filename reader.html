@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Readers - JAZE Library</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <h2 id="sidebarUsername">Username</h2>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="book.html">📚 Books</a>
+  <a href="borrow_history.html">📚 Borrow History</a>
+  <a href="borrower.html">👤 Borrower</a>
+  <a href="reader.html">📚 Reader</a>
+  <span id="adminLinkContainer"></span>
+  <hr>
+  <a href="#" id="securityCheckerBtn">🔒 Security Checker</a>
+  <a href="#" id="addSecurityTagBtn">📚 Add Security Tag</a>
+  <hr>
+  <a href="#" id="logoutBtn">🚪 Logout</a>
+</div>
+
+<div class="main">
+  <div class="header">
+    <h1>📚 JAZE Library</h1>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </div>
+
+<div class="content">
+  <!-- Controls/Header -->
+  <div class="controls">
+    <div class="section-header">
+      <h2>Readers</h2>
+      <button class="create-btn" id="createReaderBtn">➕ Add Reader</button>
+    </div>
+  </div>
+
+  <!-- Scrollable table container -->
+  <div id="readerSection" class="reader-list">
+    <table class="reader-table" id="readerTable">
+      <thead>
+        <tr>
+          <th>Reader No</th>
+          <th>Location</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="readerTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<!-- Create Reader Modal -->
+<div id="createReaderModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Add New Reader</h3>
+      <button class="modal-close" id="closeCreateReaderModal"><!--&times;--></button>
+    </div>
+    <div class="modal-body">
+      <form id="addReaderForm" novalidate>
+        <div class="modal-row">
+          <div class="field full">
+            <label for="newLocation">Location</label>
+            <input type="text" id="newLocation" placeholder="Enter reader location" required />
+          </div>
+<!--
+          <div class="field full">
+            <label for="newStatus">Status</label>
+            <select id="newStatus" required>
+              <option value="Online">Online</option>
+              <option value="Offline" selected>Offline</option>
+            </select>
+          </div>
+        -->
+
+          <div class="field full">
+            <label for="newScanMethod">Scan Method</label>
+            <select id="newScanMethod" required>
+              <option value="Single" selected>Single</option>
+              <option value="Multiple">Multiple</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-actions side-by-side">
+      <button class="btn btn-primary" id="submitCreateReader">Add Reader</button>
+      <button class="no-btn" id="cancelCreateReader">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Update Reader Modal -->
+<div id="updateReaderModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Update Reader</h3>
+      <button class="modal-close" id="closeUpdateReaderModal"><!--&times;--></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div class="field full">
+          <label for="updateReaderNo">Reader No</label>
+          <input type="text" id="updateReaderNo" readonly />
+        </div>
+
+        <div class="field full">
+          <label for="updateLocation">Location</label>
+          <input type="text" id="updateLocation" placeholder="Enter new location" required />
+        </div>
+<!--
+        <div class="field full">
+          <label for="updateStatus">Status</label>
+          <select id="updateStatus" required>
+            <option value="Online">Online</option>
+            <option value="Offline" default>Offline</option>
+          </select>
+        </div>
+-->
+        <div class="field full">
+          <label for="updateScanMethod">Scan Method</label>
+          <select id="updateScanMethod" required>
+            <option value="Single">Single</option>
+            <option value="Multiple">Multiple</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions side-by-side">
+      <button class="btn btn-primary" id="submitUpdateReader">Update Reader</button>
+      <button class="no-btn" id="cancelUpdateReader">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Reader Modal -->
+<div id="deleteReaderModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Delete Reader</h3>
+      <button class="modal-close" id="closeDeleteReaderModal"><!--&times;--></button>
+    </div>
+    <div class="modal-body delete-preview">
+      <div class="delete-details">
+        <p><strong>Reader No:</strong> <span id="deleteReaderNo">—</span></p>
+        <p><strong>Location:</strong> <span id="deleteLocation">—</span></p>
+        <p><strong>Status:</strong> <span id="deleteStatus">—</span></p>
+        <p><strong>Tag UID(s):</strong> <span id="deleteTagUid">—</span></p>
+      </div>
+    </div>
+    <div class="modal-actions side-by-side">
+      <button class="btn btn-primary" id="confirmDeleteReader">Delete</button>
+      <button class="no-btn" id="cancelDeleteReader">Cancel</button>
+      
+    </div>
+  </div>
+</div>
+
+<!-- ======= Reusable Modals ======= -->
+<div class="modal" id="confirmModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <div class="modal-header">
+      <h3 id="confirmModalTitle">Confirm Action</h3>
+      <button class="modal-close" data-close-modal="confirmModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body" id="confirmModalMessage">
+      Are you sure you want to continue?
+    </div>
+    <div class="modal-actions">
+      <button class="btn no-btn" data-close-modal="confirmModal">No</button>
+      <button class="btn btn-primary" id="confirmYes">Yes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="successModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="successModalTitle">
+    <div class="modal-header">
+      <h3 id="successModalTitle">Success</h3>
+      <button class="modal-close" data-close-modal="successModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body" id="successModalMessage">
+      Action completed successfully!
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" data-close-modal="successModal">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script type="module" src="logout.js"></script>
+<script type="module" src="sidebar.js"></script>
+<script type="module" src="admin_links.js"></script>
+<script type="module" src="reader.js"></script>
+<script type="module" src="reader_add.js"></script>
+<script type="module" src="reader_update.js"></script>
+<script type="module" src="reader_delete.js"></script>
+<script type="module" src="auto_update_status.js"></script>
+<script type="module">
+  import { startLocationTracking } from './book_tracking.js';
+  startLocationTracking(); // starts the location tracking and fallback auto-update
+</script>
+<script type="module" src="zulu_time.js"></script>
+<!--<script type="module" src="latest_history.js"></script>-->
+<script type="module" src="outside_borrow_notification.js"></script>
+<script type="module">
+  import { initReaderFunctionButtons } from "./reader_function.js";
+  initReaderFunctionButtons(); // Automatically binds to the buttons by ID
+</script>
+</body>
+</html>

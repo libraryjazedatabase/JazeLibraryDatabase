@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Profile - JAZE Library</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <h2 id="sidebarUsername">Username</h2>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="book.html">📚 Books</a>
+  <a href="borrow_history.html">📚 Borrow History</a>
+  <a href="borrower.html">👤 Borrower</a>
+  <a href="reader.html">📚 Reader</a>
+  <span id="adminLinkContainer"></span>
+  <hr>
+  <a href="#" id="securityCheckerBtn">🔒 Security Checker</a>
+  <a href="#" id="addSecurityTagBtn">📚 Add Security Tag</a>
+  <hr>
+  <a href="#" id="logoutBtn">🚪 Logout</a>
+</div>
+
+<div class="main">
+  <div class="header">
+    <h1>📚 JAZE Library</h1>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </div>
+
+  <div class="content">
+    <div class="profile-card">
+      
+      <!-- Left side -->
+      <div class="profile-left">
+
+        <!-- Account Info -->
+        <div class="profile-group">
+          <div class="profile-group-header">
+            <h3>Account Info</h3>
+          </div>
+          <div class="profile-field">
+            <label>Username:</label>
+            <span id="usernameDisplay"></span>
+            <a href="#" id="editAccountBtn" class="edit-link">Edit</a>
+          </div>
+          <div class="profile-field">
+            <label>Name:</label>
+            <span id="fullNameDisplay"></span>
+          </div>
+        </div>
+
+        <!-- Security -->
+        <div class="profile-group">
+          <div class="profile-group-header">
+            <h3>Security</h3>
+          </div>
+          <div class="profile-field">
+            <label>Email:</label>
+            <span id="emailDisplay"></span>
+          </div>
+          <div class="profile-field">
+            <label>Password:</label>
+            <span id="passwordDisplay"></span>
+            <a href="#" id="editPasswordBtn" class="edit-link">Edit</a>
+          </div>
+        </div>
+
+        <!-- Recovery -->
+        <div class="profile-group">
+          <div class="profile-group-header">
+            <h3>Recovery</h3>
+          </div>
+          <div class="profile-field">
+            <label>Recovery Question:</label>
+            <span id="recoveryQuestionDisplay"></span>
+            <a href="#" id="editRecoveryBtn" class="edit-link">Edit</a>
+          </div>
+          <div class="profile-field">
+            <label>Recovery Answer:</label>
+            <span id="recoveryAnswerDisplay"></span>
+          </div>
+        </div>
+
+      </div>
+
+<div class="profile-right">
+  <div class="profile-image-box">
+    <img src="images/default-profile.jpg" alt="Profile Picture" class="profile-image" id="profileImage">
+    <div class="profile-role">
+        <label>Role:</label>
+        <span id="roleDisplay"></span>
+    </div>
+    <a class="upload-btn" href="#" id="uploadProfileBtn">Upload a picture</a>
+
+<!-- Buttons container for side-by-side layout -->
+<div id="uploadActionBtns" style="display:none; margin-top:10px; gap:10px; justify-content:flex-start; align-items:center; flex-wrap:nowrap;">
+  <button id="saveUploadBtn" class="action-btn save-btn">Save</button>
+    <button id="cancelUploadBtn" class="action-btn cancel-btn">Cancel</button>
+</div>
+
+
+    <input type="file" id="fileInput" style="display: none;" accept="image/*" />
+  </div>
+</div>
+
+
+<!-- ======= Edit Account Modal ======= -->
+<div class="modal" id="editAccountModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="editAccountTitle">
+    <div class="modal-header">
+      <h3 id="editAccountTitle">Edit Account Info</h3>
+      <button class="modal-close" data-close-modal="editAccountModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div class="field full">
+          <p id="profileError" style="color: red; font-size: 13px; margin-bottom: 6px; display: none;"></p>      <!-- Error text appears here -->
+          <label for="modalUsername">Username</label>
+          <input type="text" id="modalUsername" placeholder="Enter username" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="field">
+          <label for="modalFname">First Name</label>
+          <input type="text" id="modalFname" placeholder="First name" />
+        </div>
+        <div class="field">
+          <label for="modalMname">Middle Name</label>
+          <input type="text" id="modalMname" placeholder="Middle name" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="field">
+          <label for="modalLname">Last Name</label>
+          <input type="text" id="modalLname" placeholder="Last name" />
+        </div>
+        <div class="field">
+          <label for="modalAbbrname">Suffix</label>
+          <input type="text" id="modalAbbrname" placeholder="Abbr. (e.g., Jr.)" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="openConfirmSave">Save</button>
+      <button class="btn no-btn" data-close-modal="editAccountModal">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Password Modal ===== -->
+<div class="modal" id="editPasswordModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h3>Change Password</h3>
+      <button class="modal-close" data-close-modal="editPasswordModal"><!--&times;--></button>
+    </div>
+    <div class="modal-body">
+      <small id="passwordError" style="color: red; display:none;"></small>
+      <label for="modalCurrentPasswordPwd">Current Password</label>
+      <input type="password" id="modalCurrentPasswordPwd" placeholder="Enter current password" required>
+      <label for="modalNewPassword1Pwd">New Password</label>
+      <input type="password" id="modalNewPassword1Pwd" placeholder="Enter new password" required>
+      <label for="modalNewPassword2Pwd">Confirm New Password</label>
+      <input type="password" id="modalNewPassword2Pwd" placeholder="Confirm new password" required>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="savePasswordBtn">Save</button>
+      <button class="btn no-btn" data-close-modal="editPasswordModal">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= Edit Recovery Modal ======= -->
+<div class="modal" id="editRecoveryModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="editRecoveryTitle">
+    <div class="modal-header">
+      <h3 id="editRecoveryTitle">Edit Recovery Info</h3>
+      <button class="modal-close" data-close-modal="editRecoveryModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div class="field full">
+          <small id="recoveryPwdError" style="color: #e74c3c; display:none; margin-top:6px;">Incorrect password, please try again.</small>
+          <label for="modalRecoveryQuestion">Recovery Question</label>
+          <input type="text" id="modalRecoveryQuestion" placeholder="Enter recovery question" />
+        </div>
+      </div>
+      <div class="modal-row">
+        <div class="field full">
+          <label for="modalRecoveryAnswer">Recovery Answer</label>
+          <input type="text" id="modalRecoveryAnswer" placeholder="Enter recovery answer" />
+        </div>
+      </div>
+
+      <!-- ===== Password confirm field for reauth ===== -->
+      <div class="modal-row">
+        <div class="field full">
+          <label for="modalRecoveryPassword">Confirm Password</label>
+          <input type="password" id="modalRecoveryPassword" placeholder="Enter your password to confirm" />
+        </div>
+      </div>
+      <!-- ===== end password confirm field ===== -->
+
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="openConfirmSaveRecovery">Save</button>
+      <button class="btn no-btn" data-close-modal="editRecoveryModal">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= Success Modal for Recovery ======= -->
+<div class="modal" id="successRecoveryModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="successRecoveryTitle">
+    <div class="modal-header">
+      <h3 id="successRecoveryTitle">Saved</h3>
+      <button class="modal-close" data-close-modal="successRecoveryModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body">
+      Recovery info updated successfully!
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" data-close-modal="successRecoveryModal">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= Confirm Modal ======= -->
+<div class="modal" id="confirmModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-header">
+      <h3 id="confirmTitle">Confirm Changes</h3>
+      <button class="modal-close" data-close-modal="confirmModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body">
+      Are you sure you want to save these changes?
+    </div>
+    <div class="modal-actions">
+      <button class="btn no-btn" data-close-modal="confirmModal">No</button>
+      <button class="btn btn-primary" id="confirmYesBtn">Yes, Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= Success Modal ======= -->
+<div class="modal" id="successModal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+    <div class="modal-header">
+      <h3 id="successTitle">Saved</h3>
+      <button class="modal-close" data-close-modal="successModal" aria-label="Close"><!--&times;--></button>
+    </div>
+    <div class="modal-body">
+      Account settings updated successfully!
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" data-close-modal="successModal">OK</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="profile_display.js"></script>
+<script type="module" src="profile_account_info.js"></script>
+<script type="module" src="profile_security.js"></script>
+<script type="module" src="profile_recovery.js"></script>
+<script type="module" src="profile_image.js"></script>
+<script type="module" src="sidebar.js"></script>
+<script type="module" src="admin_links.js"></script>
+<script type="module" src="auto_update_status.js"></script>
+<script type="module">
+  import { startLocationTracking } from './book_tracking.js';
+  startLocationTracking(); // starts the location tracking and fallback auto-update
+</script>
+<script type="module" src="zulu_time.js"></script>
+<!--<script type="module" src="latest_history.js"></script>-->
+<script type="module" src="logout.js"></script>
+<script type="module" src="outside_borrow_notification.js"></script>
+<script type="module">
+  import { initReaderFunctionButtons } from "./reader_function.js";
+  initReaderFunctionButtons(); // Automatically binds to the buttons by ID
+</script>
+</body>
+</html>

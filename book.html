@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Library Book Viewer</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <h2 id="sidebarUsername">Username</h2>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="book.html">📚 Books</a>
+  <a href="borrow_history.html">📚 Borrow History</a>
+  <a href="borrower.html">👤 Borrower</a>
+  <a href="reader.html">📚 Reader</a>
+  <span id="adminLinkContainer"></span>
+  <hr>
+  <a href="#" id="securityCheckerBtn">🔒 Security Checker</a>
+  <a href="#" id="addSecurityTagBtn">📚 Add Security Tag</a>
+  <hr>
+  <a href="#" id="logoutBtn">🚪 Logout</a>
+</div>
+
+<div class="main">
+  <div class="header">
+    <h1>📚 JAZE Library</h1>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </div>
+
+<div class="content">
+  <!-- Fixed controls -->
+  <div class="controls">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by title, author, keyword, or book UID..." />
+      <button id="addBookBtn" class="create-btn">➕ Add New Book</button>
+    </div>
+  </div>
+  <!-- Scrollable book list -->
+  <div id="bookList" class="book-list">Loading...</div>
+</div>
+<div class="overlay" id="overlay"></div>
+
+<div class="popup" id="popup">
+  <div class="popup-header">
+    <span id="popupTitle">Title</span>
+    <button class="close-btn" id="closePopup">Close</button>
+  </div>
+  <div class="popup-content" id="popupContent"></div>
+</div>
+
+<!--------------------- ADD BOOK POPUP ------------------------>
+
+<div id="addBookPopup" class="form-popup">
+  <h2 id="formTitle">Add New Book</h2>
+  <form id="addBookForm">
+    <label>Title</label>
+    <input type="text" id="bookTitle" required>
+    <label>Author</label>
+    <input type="text" id="bookAuthor" required>
+<!-- 🔹 New Preferred Location dropdown added here -->
+    <label>Preferred Location</label>
+    <select id="bookPreferredLocation" required>
+      <option value="" disabled selected>Select location</option>
+      <!-- Options will be populated dynamically from readers/{reader_no}/location -->
+    </select>
+<!-- End of new Preferred Location -->
+    <label>Keywords</label>
+    <div class="keyword-list" id="keywordList">
+      <input type="text" class="keywordInput" placeholder="Keyword">
+    </div>
+    <button type="button" id="addKeywordBtn">➕ Add Keyword</button>
+    
+    <label>Upload Cover Image</label>
+    <input type="file" id="bookCoverFile" accept="image/*">
+    <img id="coverPreview" class="cover-preview" alt="Cover Preview">
+    
+    <div class="buttons">
+      <button type="submit" class="btn btn-primary" id="submitBookBtn">Confirm</button>
+      <button type="button" class="btn no-btn" id="cancelAddBook">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<!-- Book Preview Modal -->
+<div class="modal" id="bookPreviewModal" aria-hidden="true">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="previewTitle">Book Preview</h3>
+      <button class="modal-close" data-close-modal="bookPreviewModal"><!--&times;--></button>
+    </div>
+    <div class="modal-body" id="previewBody">
+      <div class="preview-row">
+        <strong>Title:</strong><span id="previewBookTitle"></span>
+      </div>
+      <div class="preview-row">
+        <strong>Author:</strong><span id="previewBookAuthor"></span>
+      </div>
+      <!-- 🔹 New Preferred Location dropdown added here -->
+      <div class="preview-row">
+  <strong>Preferred Location:</strong><span id="previewBookPreferredLocation"></span>
+</div>
+<!-- End of new Preferred Location -->
+      <div class="preview-row">
+        <strong>Keywords:</strong><span id="previewBookKeywords"></span>
+      </div>
+      <img id="previewBookCover" src="" alt="Book Cover">
+    </div>
+    <div class="modal-actions">
+      <button class="btn no-btn" data-close-modal="bookPreviewModal">Cancel</button>
+      <button class="btn btn-primary" id="confirmAddBookBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div id="bookPopup" class="book-popup-overlay">
+  <div class="book-popup-content">
+    <span id="closeBookPopup" class="close-book-popup"><!--&times;--></span>
+    <img id="bookPopupImg" src="" alt="Book Cover">
+  </div>
+</div>
+
+
+<!-- Add Book Unit Popup -->
+<div id="addUnitPopup" class="form-popup">
+  <h2>Add Book Unit</h2>
+  <form id="addUnitForm">
+    
+    <!-- 🔴 Inline error (fixed height, above Book UID) -->
+    <div id="formError" class="error-message"></div>
+
+    <label>Book UID</label>
+    <input type="text" id="unitBookUid" placeholder="" required autofocus>
+    
+    <label>Metadata ID</label>
+    <input type="text" id="unitMetadataId" placeholder="" readonly>
+    
+    <label>Tag UID (Real-time from r3)</label>
+    <input type="text" id="unitTagUid" placeholder="Waiting for tag..." readonly required>
+    
+<!--   <label>Status</label>
+    <select id="unitStatus">
+      <option value="Available" selected>Available</option>
+      <option value="Not Available">Not Available</option>
+    </select>
+  -->
+      <label>Security Pass</label>
+    <select id="unitSecurity">
+      <option value="Yes" selected>Allowed Outside</option>
+      <option value="No">Inside Use Only</option>
+    </select>
+    
+    <label>Location</label>
+    <input type="text" id="unitLocation" placeholder="Waiting for location..." readonly>
+
+    <div class="buttons">
+      <button type="submit" class="btn btn-primary" >Add Unit</button>
+      <button type="button" class="btn no-btn" id="cancelAddUnit">Cancel</button>
+    </div>
+  </form>
+</div>
+
+<!-- ⚠️ Confirmation Modal -->
+<div class="modal" id="confirmModal" aria-hidden="true">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="confirmTitle">Confirm Action</h3>
+      <button class="modal-close" data-close-modal="confirmModal"><!--&times;--></button>
+    </div>
+    <div class="modal-body" id="confirmMessage">Are you sure?</div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="confirmYesBtn">Yes</button>
+      <button class="btn no-btn" data-close-modal="confirmModal">No</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ✅ Success Modal -->
+<div class="modal" id="successModal" aria-hidden="true">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 id="successTitle">Success</h3>
+      <button class="modal-close" data-close-modal="successModal"><!--&times;--></button>
+    </div>
+    <div class="modal-body" id="successMessage">Operation completed successfully!</div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" data-close-modal="successModal">OK</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="sidebar.js"></script>
+<script type="module" src="book.js"></script>
+<script type="module" src="admin_links.js"></script>
+<script type="module" src="logout.js"></script>
+<script type="module" src="auto_update_status.js"></script>
+<script type="module" src="zulu_time.js"></script>
+<script type="module" src="latest_history.js"></script>
+<script type="module" src="outside_borrow_notification.js"></script>
+<script type="module">
+  import { initReaderFunctionButtons } from "./reader_function.js";
+  initReaderFunctionButtons(); // Automatically binds to the buttons by ID
+</script>
+
+
+
+</body>
+</html>

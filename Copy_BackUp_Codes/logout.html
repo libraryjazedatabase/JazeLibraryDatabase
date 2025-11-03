@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logout - JAZE Library</title>
+  <script type="module">
+    import { auth } from "./firebase.js";
+    import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+    // Wait until the page loads before showing confirmation
+    window.onload = () => {
+      const confirmLogout = confirm("Are you sure you want to log out?");
+
+      if (confirmLogout) {
+        // Perform logout
+        signOut(auth)
+          .then(() => {
+            // Prevent back button access
+            window.history.pushState(null, "", window.location.href);
+            window.onpopstate = function () {
+              window.history.go(1);
+            };
+
+            // Redirect after logout
+            window.location.replace("login.html");
+          })
+          .catch((error) => {
+            console.error("Logout error:", error);
+            alert("Error logging out. Try again.");
+          });
+      } else {
+        // If user cancels, redirect back (change to your main page if needed)
+        window.location.replace("dashboard.html");
+      }
+    };
+
+    // Extra safety: if already logged out, redirect to login
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
+</head>
+<body>
+  <p>Logging out...</p>
+</body>
+</html>

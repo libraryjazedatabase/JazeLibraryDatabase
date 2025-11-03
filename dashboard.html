@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dashboard - JAZE Library</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <h2 id="sidebarUsername">Username</h2>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="book.html">📚 Books</a>
+  <a href="borrow_history.html">📚 Borrow History</a>
+  <a href="borrower.html">👤 Borrower</a>
+  <a href="reader.html">📚 Reader</a>
+  <span id="adminLinkContainer"></span>
+  <hr>
+  <a href="#" id="securityCheckerBtn">🔒 Security Checker</a>
+  <a href="#" id="addSecurityTagBtn">📚 Add Security Tag</a>
+  <hr>
+  <a href="#" id="logoutBtn">🚪 Logout</a>
+</div>
+
+<div class="main">
+  <div class="header">
+    <h1>📚 JAZE Library</h1>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </div>
+
+  <div class="content dash-main">
+    <!-- Last Updated -->
+    <div class="dash-last-updated" id="dashLastUpdated">Last Updated: --</div>
+
+    <!-- Top Cards -->
+    <div class="dash-cards">
+      <div class="dash-card">
+        <h2 id="dashTotalMaterials">0</h2>
+        <p>Total Materials</p>
+      </div>
+      <div class="dash-card">
+        <h2 id="dashBooksBorrowed">0</h2>
+        <p>Books Borrowed</p>
+      </div>
+      <div class="dash-card">
+        <h2 id="dashBooksOverdue">0</h2>
+        <p>Books Overdue</p>
+      </div>
+      <div class="dash-card">
+        <h2 id="dashTotalBorrowers">0</h2>
+        <p>Total Borrowers</p>
+      </div>
+       <div class="dash-card">
+    <h2 id="dashOfflineReaders">0</h2> <!-- New counter -->
+    <p>Offline Readers</p>
+  </div>
+    </div>
+
+    <!-- Top 10 Most Borrowed Books & Top Borrowers -->
+    <div class="dash-top-lists">
+      <div class="dash-top-list">
+        <h3>Top 10 Most Borrowed Books (This Month)</h3>
+        <div class="top-list-container">
+          <ul id="dash-top-books"></ul>
+        </div>
+      </div>
+
+      <div class="dash-top-list">
+        <h3>Top 10 Borrowers (This Month)</h3>
+        <div class="top-list-container">
+          <ul id="dash-top-borrowers"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Misplaced Books Table -->
+    <div class="dash-table-container">
+      <h3>Misplaced Books</h3>
+      <div class="table-scroll">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>Book ID</th>
+              <th>Title</th>
+              <th>Location</th>
+              <th>Last Seen</th>
+            </tr>
+          </thead>
+          <tbody id="dash-misplaced-books-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Borrowings Today Table -->
+    <div class="dash-table-container">
+      <h3>Borrowings Today</h3>
+      <div class="table-scroll">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>Borrower</th>
+              <th>Book</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="dash-borrowings-today-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- JS modules -->
+<script type="module" src="logout.js"></script>
+<script type="module" src="sidebar.js"></script>
+<script type="module" src="admin_links.js"></script>
+<script type="module" src="dashboard.js"></script>
+<script type="module" src="auto_update_status.js"></script>
+<script type="module">
+  import { startLocationTracking } from './book_tracking.js';
+  startLocationTracking(); // starts the location tracking and fallback auto-update
+</script>
+<script type="module" src="zulu_time.js"></script>
+<!--<script type="module" src="latest_history.js"></script>-->
+<script type="module" src="auto_reader_status.js"></script>
+<script type="module" src="outside_borrow_notification.js"></script>
+<script type="module">
+  import { initReaderFunctionButtons } from "./reader_function.js";
+  initReaderFunctionButtons(); // Automatically binds to the buttons by ID
+</script>
+
+
+
+
+
+</body>
+</html>

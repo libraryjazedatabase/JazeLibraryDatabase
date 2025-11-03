@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Password Recovery</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="recover_body">
+  <div class="container">
+    <img src="images/JAZE_logo.png" alt="JAZE Logo" class="logo">
+    <h2 class="recover_h2">Recover Password</h2>
+
+    <div id="recoverError" class="recover_error"></div>
+
+    <div id="step-username">
+      <input type="text" id="username" placeholder="Enter Username" required />
+      <button id="nextBtn">Next</button>
+      <button class="cancel" onclick="window.location.href='login.html'">Cancel</button>
+    </div>
+
+    <div id="step-question" class="hidden">
+      <p id="recoveryQuestion"></p>
+      <input type="text" id="recoveryAnswer" placeholder="Enter your answer" required />
+      <button id="submitAnswer">Submit</button>
+      <button id="cancelBtn" class="cancel">Cancel</button>
+    </div>
+  </div>
+
+  <script type="module" src="recover.js"></script>
+</body>
+</html>

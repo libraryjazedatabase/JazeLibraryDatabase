@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Active Borrowers - JAZE Library</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <h2 id="sidebarUsername">Username</h2>
+  <a href="dashboard.html">🏠 Dashboard</a>
+  <a href="profile.html">👤 Profile</a>
+  <a href="book.html">📚 Books</a>
+  <a href="borrow_history.html">📚 Borrow History</a>
+  <a href="borrower.html">👤 Borrower</a>
+  <a href="reader.html">📚 Reader</a>
+  <span id="adminLinkContainer"></span>
+  <hr>
+  <a href="#" id="securityCheckerBtn">🔒 Security Checker</a>
+  <a href="#" id="addSecurityTagBtn">📚 Add Security Tag</a>
+  <hr>
+  <a href="#" id="logoutBtn">🚪 Logout</a>
+</div>
+
+<!-- Main content -->
+<div class="main">
+  <div class="header">
+    <h1>📚 Borrow History</h1>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </div>
+
+<div class="content">
+
+  <!-- Controls (search bar + filters) -->
+  <div class="controls">
+    <!-- Top row: search bar + export button -->
+    <div class="search-bar" style="align-items: center; gap: 10px;">
+      <input 
+        type="text" 
+        id="searchActiveBorrowers" 
+        placeholder="Search by name, email, or book title..." 
+      />
+      <button id="exportActiveBorrowers" class="create-btn">📄 Download Data</button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-controls" style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 1rem;">
+      <select id="levelFilterActive">
+        <option value="All">Level</option>
+      </select>
+
+      <select id="courseFilterActive">
+        <option value="All">Course</option>
+      </select>
+
+      <select id="yearFilterActive">
+        <option value="All">Year</option>
+      </select>
+
+      <!-- Status Filter -->
+      <select id="statusFilterActive">
+        <option value="All">Status</option>
+        <option value="Borrowed">Borrowed</option>
+        <option value="Overdue">Overdue</option>
+        <option value="Late">Late</option>
+        <option value="Returned">Returned</option>
+      </select>
+
+      <!-- Location Filter -->
+      <select id="locationFilterActive">
+        <option value="All">Location</option>
+        <option value="Inside">Inside</option>
+        <option value="Outside">Outside</option>
+      </select>
+
+<div class="filter-group">
+  <label for="startDateFilter">Start Date:</label>
+  <input type="date" id="startDateFilter" />
+</div>
+
+<div class="filter-group">
+  <label for="endDateFilter">End Date:</label>
+  <input type="date" id="endDateFilter" />
+</div>
+
+
+      <button id="clearFiltersActive">Clear Filters</button>
+    </div>
+  </div> <!-- end of controls -->
+
+  <!-- Scrollable table -->
+  <div class="borrowers-list">
+    <table class="borrower-table" id="activeBorrowersTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Level/Course</th>
+          <th>Book Title</th>
+          <th>Book ID</th>
+          <th>Borrow Date</th>
+          <th>Return Date</th>
+          <th>Location</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="activeBorrowersTableBody"></tbody>
+    </table>
+  </div> <!-- end of scrollable table -->
+</div> <!-- end of content -->
+</div>
+
+
+
+<!-- Scripts -->
+<script type="module" src="logout.js"></script>
+<script type="module" src="sidebar.js"></script>
+<script type="module" src="active_borrowers.js"></script>
+<script type="module" src="admin_links.js"></script>
+<script type="module">
+  import { startLocationTracking } from './book_tracking.js';
+  startLocationTracking(); // starts the location tracking and fallback auto-update
+</script>
+<script type="module" src="zulu_time.js"></script>
+<script type="module" src="latest_history.js"></script>
+<script type="module" src="outside_borrow_notification.js"></script>
+<script type="module">
+  import { initReaderFunctionButtons } from "./reader_function.js";
+  initReaderFunctionButtons(); // Automatically binds to the buttons by ID
+</script>
+
+</body>
+</html>
