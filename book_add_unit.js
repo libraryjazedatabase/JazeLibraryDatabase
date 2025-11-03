@@ -21,7 +21,8 @@ document.querySelectorAll('[data-close-modal]').forEach(btn => {
 async function setReaderModeToBook() {
   const r3Ref = ref(db, 'readers/r3');
   await update(r3Ref, {
-    card_type: "book_card"
+    card_type: "book_card",
+    function:"write"
   });
 }
 
