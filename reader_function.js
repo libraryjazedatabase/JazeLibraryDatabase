@@ -76,11 +76,4 @@ export function initReaderFunctionButtons() {
       updateReaderFunction("security");
     });
   }
-
-  if (addSecurityTagLink) {
-    addSecurityTagLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      updateReaderFunction("write");
-    });
-  }
 }
