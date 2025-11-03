@@ -66,7 +66,7 @@ loginForm.addEventListener("submit", async (e) => {
         localStorage.setItem("logKey", logRef.key);
 
         //  Redirect to profile page
-        window.location.href = "dashboard.html";
+        window.location.href = "index.html";
 
     } catch (error) {
         console.error(error);
