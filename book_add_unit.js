@@ -1,5 +1,5 @@
 import { db } from './firebase.js';
-import { ref, onValue, set , update} from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+import { ref, onValue, set , get, update} from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
 
 //  Modal helpers for opening and closing modals
 window.openModal = function(id) {
@@ -66,7 +66,12 @@ addUnitForm.addEventListener('submit', async (e) => {
   const bookUid = document.getElementById('unitBookUid').value.trim();
   const metadataId = document.getElementById('unitMetadataId').value.trim();
   const tagUid = document.getElementById('unitTagUid').value.trim();
-  const security_pass = document.getElementById('unitSecurity').value; //added security pass tas security reader
+
+const metadataSnap = await get(ref(db, `book_metadata/${metadataId}`));
+const metadata = metadataSnap.val() || {};
+const security_pass = metadata.security_pass || 'Yes'; // fallback if missing
+
+
   const location = document.getElementById('unitLocation').value.trim() || 'Unknown';
   const status = "Available";
   const last_seen = "Adding Station";

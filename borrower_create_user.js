@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
         resetForm();
         openModal();
 
-        await update(ref(db, 'readers/r3'), { card_type: "borrowers_card" });
+        await update(ref(db, 'readers/r3'), { card_type: "borrowers_card" , function: "write"});
     });
 
     // -------------------- Close Modal --------------------

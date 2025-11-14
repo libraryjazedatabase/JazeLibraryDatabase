@@ -1,12 +1,16 @@
 import { db } from './firebase.js';
-import { ref, get } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+import { ref, onValue } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
 
 const historyModal = document.getElementById('borrowerHistoryModal');
 const closeHistoryBtn = document.getElementById('closeHistoryModalBtn');
 const historyContent = document.getElementById('historyContent');
 
-// Format date
+let booksMeta = {};
+let bookUnits = {};
+let allHistory = {};
+let currentBorrowerId = null; // track currently open borrower
 
+// ---------------- Format date ----------------
 function formatDate(timestamp) {
   if (!timestamp) return 'N/A';
   const date = new Date(timestamp);
@@ -15,85 +19,62 @@ function formatDate(timestamp) {
   return date.toLocaleString(undefined, options);
 }
 
-
-// Close modal
+// ---------------- Close modal ----------------
 closeHistoryBtn.addEventListener('click', () => {
   historyModal.style.display = 'none';
 });
 
-// ---------------- Cache book metadata, book units, and all borrow_history ----------------
-let booksMeta = {};
-let bookUnits = {};
-let allHistory = {};
-
-async function loadAllData() {
-  // Fetch book metadata
-  const metaSnap = await get(ref(db, 'book_metadata'));
-  booksMeta = metaSnap.val() || {};
-
-  // Fetch book units
-  const unitSnap = await get(ref(db, 'book_unit'));
-  bookUnits = unitSnap.val() || {};
-
-  // Fetch all borrow_history once
-  const historySnap = await get(ref(db, 'borrow_history'));
-  allHistory = historySnap.val() || {};
+// ---------------- Open modal ----------------
+export function openBorrowerHistoryModal(borrowerId) {
+  currentBorrowerId = borrowerId;
+  historyModal.style.display = 'flex';
+  renderBorrowerHistory(borrowerId);
 }
 
-// ---------------- Open modal and render table ----------------
-export function openBorrowerHistoryModal(borrowerId) {
+// ---------------- Render table ----------------
+function renderBorrowerHistory(borrowerId) {
   historyContent.innerHTML = '<p style="text-align:center; margin-top:20px;">Loading...</p>';
-  historyModal.style.display = 'flex';
 
   const borrowerHistory = [];
 
   Object.entries(allHistory).forEach(([bookUID, bookRecords]) => {
-    // Loop through each history record
     Object.values(bookRecords).forEach(h => {
-      if (h.borrower_id === borrowerId) borrowerHistory.push({ ...h, book_uid: bookUID });
+      if (h.borrower_id === borrowerId && h.borrow_date) {
+        borrowerHistory.push({ ...h, book_uid: bookUID, borrowDt: new Date(h.borrow_date) });
+      }
     });
   });
 
-   // Sort by borrow_date descending
-  borrowerHistory.sort((a, b) => new Date(b.borrow_date) - new Date(a.borrow_date));
+  borrowerHistory.sort((a, b) => b.borrowDt - a.borrowDt);
 
-
-  if (borrowerHistory.length === 0) {
+  if (!borrowerHistory.length) {
     historyContent.innerHTML = `<p style="text-align:center; margin-top:20px;">No history found.</p>`;
     return;
   }
 
-// Build table
-let html = `<div class="history-table-container">
-  <table class="history-table">
-    <thead>
-      <tr>
-        <th>Book Title</th>
-        <th>Book ID</th>
-        <th>Borrow Date</th>
-        <th>Return Date</th>
-        <th>Location</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>`;
-
+  let html = `<div class="history-table-container">
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>Book Title</th>
+          <th>Book ID</th>
+          <th>Borrow Date</th>
+          <th>Return Date</th>
+          <th>Location</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>`;
 
   borrowerHistory.forEach(h => {
     const bookUID = h.book_uid || 'N/A';
-    const borrowDate = formatDate(h.borrow_date) || 'N/A';
-    const returnDate = (!h.return_date || h.return_date.trim() === '') 
-  ? 'Not Returned' 
-  : formatDate(h.return_date);
-
+    const borrowDate = formatDate(h.borrowDt);
+    const returnDate = (!h.return_date || h.return_date.trim() === '') ? 'Not Returned' : formatDate(h.return_date);
     const status = h.status || 'N/A';
     const location = h.location || 'N/A';
 
-    // Get metadata_id from book_unit
     const bookUnit = bookUnits[bookUID] || {};
     const metadataId = bookUnit.metadata_id || null;
-
-    // Get title from book_metadata using metadata_id
     const bookMeta = metadataId ? booksMeta[metadataId] || {} : {};
     const bookTitle = bookMeta.title || 'Unknown Title';
 
@@ -107,14 +88,30 @@ let html = `<div class="history-table-container">
     </tr>`;
   });
 
-  html += `</tbody></table>`;
+  html += `</tbody></table></div>`;
   historyContent.innerHTML = html;
 }
 
-// Listen for event from borrower_users.js
+// ---------------- Real-time listeners ----------------
+function initRealTimeListeners() {
+  onValue(ref(db, 'book_metadata'), snap => {
+    booksMeta = snap.val() || {};
+    if (currentBorrowerId) renderBorrowerHistory(currentBorrowerId);
+  });
+  onValue(ref(db, 'book_unit'), snap => {
+    bookUnits = snap.val() || {};
+    if (currentBorrowerId) renderBorrowerHistory(currentBorrowerId);
+  });
+  onValue(ref(db, 'borrow_history'), snap => {
+    allHistory = snap.val() || {};
+    if (currentBorrowerId) renderBorrowerHistory(currentBorrowerId);
+  });
+}
+
+// ---------------- Event listener from borrower_users.js ----------------
 document.addEventListener("openBorrowHistoryModal", (e) => {
   openBorrowerHistoryModal(e.detail.borrowerId);
 });
 
-// ---------------- Load everything once on page load ----------------
-loadAllData();
+// ---------------- Start listeners ----------------
+initRealTimeListeners();

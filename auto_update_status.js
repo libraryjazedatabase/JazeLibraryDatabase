@@ -15,17 +15,6 @@ function isActiveTab() {
   return Date.now() - latest < 2000; // within 2 seconds = leader
 }
 
-//helper convert timezone to ph time
-function toPhilippineTime(utcDate) {
-  if (!utcDate) return null;
-  // Get the UTC time in milliseconds
-  const utcMillis = utcDate.getTime();
-  // PH time offset = UTC+8 hours
-  const phOffset = 8 * 60; // in minutes
-  const phMillis = utcMillis + phOffset * 60000;
-  return new Date(phMillis);
-}
-
 //auto update status function
 async function autoUpdateStatuses() {
   // Only run if this tab is the "leader"
@@ -62,11 +51,13 @@ async function autoUpdateStatuses() {
       // Skip if no data found
       if (!borrowDate) return;
 
+
       // -------------------- DETERMINE DUE DATE --------------------
       // Convert borrowDate to local time for accurate comparison:
-      const borrowLocal = toPhilippineTime(borrowDate);
-      const returnLocal = returnDate ? toPhilippineTime(returnDate) : null;
-      const nowLocal = toPhilippineTime(new Date());
+const borrowLocal = borrowDate;     // already local PH time
+const returnLocal = returnDate;     // already local PH time
+const nowLocal = new Date();        // already local PH time
+
       const thirtyDaysAgo = new Date(nowLocal);
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -82,6 +73,15 @@ async function autoUpdateStatuses() {
         dueDate.setHours(closingHour, 0, 0, 0);
       }
 
+// DEBUG LOGS
+//console.log("---- Checking Record ----");
+//console.log("Raw Borrow Date:", data.borrow_date);
+//console.log("Borrow Date (Local):", borrowLocal);
+//console.log("Return Date (Local):", returnLocal);
+//console.log("Now Local:", nowLocal);
+//console.log("Location:", location);
+//console.log("Due Date:", dueDate);
+
       // Skip updates for recent Returned/Late
 if (returnLocal && (data.status === "Returned" || data.status === "Late")) {
     if (returnLocal >= thirtyDaysAgo) return;
@@ -90,10 +90,11 @@ if (returnLocal && (data.status === "Returned" || data.status === "Late")) {
 
       // -------------------- DETERMINE CURRENT STATUS --------------------
 let newStatus = data.status || "Borrowed";
+
 if (!returnLocal) {
     newStatus = nowLocal > dueDate ? "Overdue" : "Borrowed";
 } else {
-    newStatus = returnLocal <= dueDate ? "Returned" : "Late";
+    newStatus = returnLocal > dueDate ? "Late" : "Returned";
 }
 
 

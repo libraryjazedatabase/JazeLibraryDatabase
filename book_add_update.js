@@ -1,5 +1,5 @@
 import { db } from './firebase.js';
-import { ref, set, update, get } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
+import { ref, set, update, get, onValue} from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
 import { 
   addBookBtn, addBookPopup, addBookForm, keywordList, addKeywordBtn, cancelAddBook,
   bookCoverFile, coverPreview, submitBookBtn, formTitle, overlay
@@ -102,19 +102,21 @@ bookCoverFile.addEventListener('change', () => {
 });
 
 // -------------------- Fill Preview Modal --------------------
-function fillPreviewModal(title, author, preferredLocation, keywords, cover) {
+function fillPreviewModal(title, author, preferredLocation, securityPass, keywords, cover) {
     const modal = document.getElementById('bookPreviewModal');
     if (!modal) return;
 
     const titleEl = modal.querySelector('#previewBookTitle');
     const authorEl = modal.querySelector('#previewBookAuthor');
     const locationEl = modal.querySelector('#previewBookPreferredLocation');
+    const securityEl = modal.querySelector('#previewSecurityPass');
     const keywordsEl = modal.querySelector('#previewBookKeywords');
     const coverEl = modal.querySelector('#previewBookCover');
 
     if (titleEl) titleEl.textContent = title || 'Untitled';
     if (authorEl) authorEl.textContent = author || 'Unknown Author';
     if (locationEl) locationEl.textContent = preferredLocation || 'No location selected';
+   if (securityEl) securityEl.textContent = securityPass || 'N/A';
     if (keywordsEl) keywordsEl.textContent = keywords.length ? keywords.join(', ') : 'No keywords';
 
     if (coverEl) {
@@ -134,9 +136,11 @@ addBookForm.addEventListener('submit', e => {
     const title = document.getElementById('bookTitle').value.trim();
     const author = document.getElementById('bookAuthor').value.trim();
     const preferredLocation = document.getElementById('bookPreferredLocation').value;
+let securityPass = document.getElementById('unitSecurity').value;
+securityPass = securityPass === "Yes" ? "Allowed Outside" : "Inside Use Only";
     const keywords = Array.from(document.querySelectorAll('.keywordInput')).map(i => i.value.trim()).filter(v => v);
     const cover = coverPreview.src && coverPreview.style.display === 'block' ? coverPreview.src : '';
-    fillPreviewModal(title, author, preferredLocation, keywords, cover);
+    fillPreviewModal(title, author, preferredLocation, securityPass,keywords, cover);
     document.getElementById('bookPreviewModal').classList.add('open');
 });
 
@@ -147,6 +151,7 @@ document.getElementById('confirmAddBookBtn').addEventListener('click', async () 
     const title = document.getElementById('bookTitle').value.trim();
     const author = document.getElementById('bookAuthor').value.trim();
     const preferredLocation = document.getElementById('bookPreferredLocation').value;
+    const security_pass = document.getElementById('unitSecurity').value.trim();
     const keywords = Array.from(document.querySelectorAll('.keywordInput')).map(i => i.value.trim()).filter(v => v);
     const cover = coverPreview.src && coverPreview.style.display === 'block' ? coverPreview.src : '';
     document.getElementById('bookPreviewModal').classList.remove('open');
@@ -154,16 +159,31 @@ document.getElementById('confirmAddBookBtn').addEventListener('click', async () 
     try {
         if (!isEditing) {
             const newMetaId = `BOOK-${Date.now()}`;
-            await set(ref(db, `book_metadata/${newMetaId}`), { title, author, preferred_location: preferredLocation, cover, keywords });
+            await set(ref(db, `book_metadata/${newMetaId}`), { title, author, preferred_location: preferredLocation, cover, keywords ,security_pass});
             showSuccessModal('✅ Book added successfully!');
         } else if (editingMetaId) {
-            await update(ref(db, `book_metadata/${editingMetaId}`), { title, author, preferred_location: preferredLocation, cover, keywords });
-            showSuccessModal('✅ Book updated successfully!');
-            isEditing = false;
-            editingMetaId = null;
-            formTitle.textContent = 'Add New Book';
-            submitBookBtn.textContent = 'Save';
-        }
+        // Update metadata
+        await update(ref(db, `book_metadata/${editingMetaId}`), { 
+            title, author, preferred_location: preferredLocation, cover, keywords, security_pass 
+        });
+
+        // Update security_pass for all book units using this metadata
+        const unitsRef = ref(db, 'book_unit');
+        onValue(unitsRef, async (snapshot) => {
+            const units = snapshot.val() || {};
+            for (const [uid, data] of Object.entries(units)) {
+                if (data.metadata_id === editingMetaId) {
+                    await update(ref(db, `book_unit/${uid}`), { security_pass });
+                }
+            }
+        }, { onlyOnce: true });
+
+        showSuccessModal('✅ Book updated successfully!');
+        isEditing = false;
+        editingMetaId = null;
+        formTitle.textContent = 'Add New Book';
+        submitBookBtn.textContent = 'Save';
+    }
     } catch (err) {
         showSuccessModal('❌ Error saving book: ' + err.message);
     } finally {
@@ -204,6 +224,8 @@ export async function openBookFormForUpdate(metaId, metas) {
     // Wait for preferred locations to load before setting value
     await populatePreferredLocations();
     document.getElementById('bookPreferredLocation').value = meta.preferred_location || '';
+    document.getElementById('unitSecurity').value = meta.security_pass || 'Yes';
+
 
     // Populate keywords
     keywordList.innerHTML = '';

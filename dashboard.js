@@ -96,17 +96,11 @@ const latestHistoryNo = Object.keys(histories)
     if (status === "Overdue") overdueCount++;
 
 // 📅 Borrowings Today
-Object.keys(histories)
-  .sort((a, b) => {
-    const numA = parseInt(a.split('_')[1]);
-    const numB = parseInt(b.split('_')[1]);
-    return numA - numB; // ascending order
-  })
-  .forEach(historyNo => {
-    const h = histories[historyNo];
+Object.values(histories).forEach(h => {
     const borrowDt = h.borrow_date ? new Date(h.borrow_date) : null;
     if (!borrowDt) return;
 
+    // Only today's borrowings
     if (isSameDay(borrowDt, now)) {
       const borrower = borrowers[h.borrower_id] || {};
       const bookUnit = bookUnits[bookUID] || {};
@@ -115,7 +109,7 @@ Object.keys(histories)
       borrowingsToday.push({
         borrower: getBorrowerName(borrower),
         book: meta.title || "Unknown",
-        time: borrowDt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        borrowDt // store the actual Date object
       });
     }
   });
@@ -192,11 +186,18 @@ misplacedBooksTableBody.innerHTML = misplacedBooks.length
   : `<tr><td colspan="4">No misplaced books</td></tr>`;
 
   // 📅 Borrowings Today Table
-  borrowingsTodayTableBody.innerHTML = borrowingsToday.length
-    ? borrowingsToday.map(b =>
-        `<tr><td>${b.borrower}</td><td>${b.book}</td><td>${b.time}</td></tr>`
-      ).join("")
-    : `<tr><td colspan="3">No borrowings today</td></tr>`;
+borrowingsToday.sort((a, b) => b.borrowDt - a.borrowDt);
+
+borrowingsTodayTableBody.innerHTML = borrowingsToday.length
+  ? borrowingsToday.map(b =>
+      `<tr>
+         <td>${b.borrower}</td>
+         <td>${b.book}</td>
+         <td>${b.borrowDt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+       </tr>`
+    ).join("")
+  : `<tr><td colspan="3">No borrowings today</td></tr>`;
+
 
   // 🏆 Top 10 Books
   topBooksContainer.innerHTML = Object.entries(bookCountThisMonth)

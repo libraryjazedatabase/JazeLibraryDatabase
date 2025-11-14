@@ -59,13 +59,19 @@
     <input type="text" id="bookTitle" required>
     <label>Author</label>
     <input type="text" id="bookAuthor" required>
-<!-- 🔹 New Preferred Location dropdown added here -->
+
     <label>Preferred Location</label>
     <select id="bookPreferredLocation" required>
       <option value="" disabled selected>Select location</option>
       <!-- Options will be populated dynamically from readers/{reader_no}/location -->
     </select>
-<!-- End of new Preferred Location -->
+
+    <label>Security Pass</label>
+    <select id="unitSecurity">
+      <option value="Yes" selected>Allowed Outside</option>
+      <option value="No">Inside Use Only</option>
+    </select>
+
     <label>Keywords</label>
     <div class="keyword-list" id="keywordList">
       <input type="text" class="keywordInput" placeholder="Keyword">
@@ -102,6 +108,10 @@
   <strong>Preferred Location:</strong><span id="previewBookPreferredLocation"></span>
 </div>
 <!-- End of new Preferred Location -->
+       <div class="preview-row">
+        <strong>Security Pass: </strong><span id="previewSecurityPass"></span>
+      </div>
+
       <div class="preview-row">
         <strong>Keywords:</strong><span id="previewBookKeywords"></span>
       </div>
@@ -144,13 +154,7 @@
       <option value="Available" selected>Available</option>
       <option value="Not Available">Not Available</option>
     </select>
-  -->
-      <label>Security Pass</label>
-    <select id="unitSecurity">
-      <option value="Yes" selected>Allowed Outside</option>
-      <option value="No">Inside Use Only</option>
-    </select>
-    
+  -->    
     <label>Location</label>
     <input type="text" id="unitLocation" placeholder="Waiting for location..." readonly>
 
