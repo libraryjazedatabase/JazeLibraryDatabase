@@ -159,6 +159,7 @@ Object.keys(histories)
         id: bookUID,
         title: meta.title || "Unknown",
         location: currentLoc,
+        preferredLoc: preferredLoc,
         last_seen: last_seen
       });
     }
@@ -180,10 +181,11 @@ misplacedBooksTableBody.innerHTML = misplacedBooks.length
          <td>${b.id}</td>
          <td>${b.title}</td>
          <td>${b.location}</td>
+         <td>${b.preferredLoc}</td>
          <td>${b.last_seen}</td>
        </tr>`
     ).join("")
-  : `<tr><td colspan="4">No misplaced books</td></tr>`;
+  : `<tr><td colspan="5">No misplaced books</td></tr>`;
 
   // 📅 Borrowings Today Table
 borrowingsToday.sort((a, b) => b.borrowDt - a.borrowDt);
